@@ -1,6 +1,8 @@
 package decrypt
 
 import (
+	"github.com/lingt-xyz/substitutionDeciphers/encrypt"
+	"github.com/lingt-xyz/substitutionDeciphers/text"
 	"strings"
 	"testing"
 )
@@ -19,10 +21,23 @@ func TestGetLetterFrequencies(t *testing.T) {
 			U+8A9E '語' starts at byte position 61`, "UEstartsatbytepositionUCstartsatbytepositionUAEstartsatbyteposition"},
 	}
 	for _, testCase := range testCases {
-		output, frequencyArray := getLetterFrequencies(testCase.input)
-		if output != strings.ToUpper(testCase.output) {
-			t.Errorf("Excepting: %v\n\t\tGot: %v", strings.ToUpper(testCase.output), output)
-		}
+		frequencyArray := getLetterFrequencies(strings.ToUpper(testCase.output))
 		t.Logf("Frequency: %v", frequencyArray)
 	}
+}
+
+func TestGuessKeyByFrequencyAnalysis(t *testing.T){
+	cipherText := strings.ToUpper("LefranaisestunelangueindoeuropennedelafamilledeslanguesromanesLefranaissestformenFrancevaritdelalanguedolquiestlalanguedelapartieseptentrionaledupaysLefranaisestdclarlangueofficielleenFranceen")
+	frequencyArray := getLetterFrequencies(cipherText)
+	keys := guessKeyByFrequencyAnalysis(frequencyArray)
+	t.Logf("Guessed keys: %v", keys)
+}
+
+func TestParseCipherText(t *testing.T){
+	plainText := text.FilterText("defend the east wall of the castle")
+
+	encrypt.Encipher(plainText, encrypt.GenerateKey(text.KeySpace))
+	keys, matrix := parseCipherText(plainText)
+	t.Logf("%v", keys)
+	t.Logf("%v", matrix)
 }

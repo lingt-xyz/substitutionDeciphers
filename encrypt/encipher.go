@@ -1,7 +1,7 @@
 package encrypt
 
 import (
-	"github.com/lingt-xyz/substitutionDeciphers/keySpace"
+	"github.com/lingt-xyz/substitutionDeciphers/text"
 	"math/rand"
 	"strings"
 	"time"
@@ -16,7 +16,7 @@ func GenerateKey(keySpace []byte) []byte {
 }
 
 func Encipher(s string, keys []byte) (string, string) {
-	s = keySpace.FilterText(s)
+	s = text.FilterText(s)
 	var b strings.Builder
 	b.Grow(len(s))
 	for i := 0; i < len(s); i++ {

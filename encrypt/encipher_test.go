@@ -1,15 +1,15 @@
 package encrypt
 
 import (
-	"github.com/lingt-xyz/substitutionDeciphers/keySpace"
+	"github.com/lingt-xyz/substitutionDeciphers/text"
 	"testing"
 )
 
 func TestGenerateKey(t *testing.T) {
-	t.Logf("Before shuffle: %v", keySpace.KeySpace)
-	keys := GenerateKey(keySpace.KeySpace)
+	t.Logf("Before shuffle: %v", text.KeySpace)
+	keys := GenerateKey(text.KeySpace)
 	t.Logf("After shuffle: %v", keys)
-	t.Logf("KeySpace: %v", keySpace.KeySpace)
+	t.Logf("KeySpace: %v", text.KeySpace)
 }
 
 func TestEncipher(t *testing.T) {

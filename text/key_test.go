@@ -1,4 +1,4 @@
-package keySpace
+package text
 
 import (
 	"strings"

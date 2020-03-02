@@ -5,18 +5,7 @@ import (
 	"testing"
 )
 
-func TestLetterFrequencies(t *testing.T) {
-	if len(LetterFrequencies) != 26 {
-		t.Errorf("LetterFrequencies should be size of 26, got %v", len(LetterFrequencies))
-	}
-	for i := 1; i < len(LetterFrequencies); i++ {
-		if LetterFrequencies[i].frequency >= LetterFrequencies[i-1].frequency {
-			t.Errorf("LetterFrequencies is not sorted between %v and %v", LetterFrequencies[i-1], LetterFrequencies[i])
-		}
-	}
-}
-
-func TestSymbolFrequency(t *testing.T) {
+func TestGetLetterFrequencies(t *testing.T) {
 	testCases := []struct {
 		input  string
 		output string
@@ -30,11 +19,10 @@ func TestSymbolFrequency(t *testing.T) {
 			U+8A9E '語' starts at byte position 61`, "UEstartsatbytepositionUCstartsatbytepositionUAEstartsatbyteposition"},
 	}
 	for _, testCase := range testCases {
-		output, frequency := getSymbolFrequency(testCase.input)
+		output, frequencyArray := getLetterFrequencies(testCase.input)
 		if output != strings.ToUpper(testCase.output) {
 			t.Errorf("Excepting: %v\n\t\tGot: %v", strings.ToUpper(testCase.output), output)
 		}
-		t.Logf("Frequency: %v", frequency)
+		t.Logf("Frequency: %v", frequencyArray)
 	}
-
 }

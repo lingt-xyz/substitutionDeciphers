@@ -2,7 +2,6 @@ package decrypt
 
 import (
 	"github.com/lingt-xyz/substitutionDeciphers/text"
-	"log"
 	"math"
 	"sort"
 )
@@ -84,20 +83,45 @@ func fastMethodAlgorithm1() {
 // 11, Ket `k=k'`
 // 12. Let `D=D'`
 // 13. Go to step 6
-func fastMethodAlgorithm2(input string) {
+func fastMethodAlgorithm2(input string) []byte {
 	cipherText := text.FilterText(input)
-	keys, matrix := parseCipherText(cipherText)
-	d := getMatricesDistance(matrix, BiGramFactMatrix)
-	swapKeys(keys, 1)
-	log.Printf("%v, %v", keys, matrix)
-	log.Println(d)
+	key, matrix := parseCipherText(cipherText)
+	score := getMatricesDistance(matrix, BiGramFactMatrix)
+
+start:
+	for i := 1; i < 26; i++ {
+		for j := 1; j < 26-i; j++ {
+			newMatrix := swapMatrix(matrix, j, i)
+			newScore := getMatricesDistance(newMatrix, BiGramFactMatrix)
+			if newScore < score {
+				// update keys and matrix
+				key = swapKey(key, j, i)
+				matrix = newMatrix
+				score = newScore
+				continue start
+			}
+		}
+	}
+	return key
 }
 
-func swapKeys(keys []byte, distance int) {
+func swapKey(keys []byte, j int, i int) []byte {
 	newKeys := make([]byte, 26)
-	for i := 0; i < len(keys)-distance; i++ {
-		newKeys[i] = keys[i+distance]
+	copy(newKeys, keys)
+	newKeys[j] = keys[j+i]
+	newKeys[j+i] = keys[j]
+	return newKeys
+}
+
+func swapMatrix(matrix [26][26]float64, j int, i int) [26][26]float64 {
+	newMatrix := matrix
+	newMatrix[j] = matrix[j+i]
+	newMatrix[j+i] = matrix[j]
+	for row := range newMatrix {
+		newMatrix[row][j] = matrix[row][j+i]
+		newMatrix[row][j+i] = matrix[row][j]
 	}
+	return newMatrix
 }
 
 func getMatricesDistance(m1, m2 [26][26]float64) float64 {

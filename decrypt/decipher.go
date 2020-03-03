@@ -1,7 +1,6 @@
 package decrypt
 
 import (
-	"github.com/lingt-xyz/substitutionDeciphers/text"
 	"math"
 	"sort"
 )
@@ -59,7 +58,7 @@ func parseCipherText(s string) ([]byte, [26][26]float64) {
 	return keys, biGramPercentageMatrix
 }
 
-// have to parse the text every time
+// fastMethodAlgorithm1 has to parse the text every time
 func fastMethodAlgorithm1() {
 	// 1. Construct an initial keySpace guess, `k`, based upon the symbol frequencies of the expected language and the ciphertext
 	// 2. Calculate `v=f(d(letter,k))`
@@ -83,8 +82,7 @@ func fastMethodAlgorithm1() {
 // 11, Ket `k=k'`
 // 12. Let `D=D'`
 // 13. Go to step 6
-func fastMethodAlgorithm2(input string) []byte {
-	cipherText := text.FilterText(input)
+func fastMethodAlgorithm2(cipherText string) []byte {
 	key, matrix := parseCipherText(cipherText)
 	score := getMatricesDistance(matrix, BiGramFactMatrix)
 

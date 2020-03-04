@@ -37,7 +37,7 @@ func TestParseCipherText(t *testing.T){
 	plainText := text.FilterText("defend the east wall of the castle")
 
 	encrypt.Encipher(plainText, encrypt.GenerateKey(text.KeySpace))
-	keys, matrix := parseCipherText(plainText)
+	keys, matrix := parseText(plainText)
 	t.Logf("%v", keys)
 	t.Logf("%v", matrix)
 }

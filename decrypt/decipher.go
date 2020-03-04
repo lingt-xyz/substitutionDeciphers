@@ -1,6 +1,8 @@
 package decrypt
 
 import (
+	"github.com/lingt-xyz/substitutionDeciphers/encrypt"
+	"log"
 	"math"
 	"sort"
 )
@@ -25,7 +27,8 @@ func getLetterFrequencies(s string) []LetterFrequency {
 	sort.SliceStable(frequencyArray, func(i, j int) bool {
 		return frequencyArray[i].frequency > frequencyArray[j].frequency
 	})
-
+	log.Printf("%v", LetterFrequencyFactArray)
+	log.Printf("%v", frequencyArray)
 	return frequencyArray
 }
 
@@ -39,23 +42,28 @@ func guessKeyByFrequencyAnalysis(frequencyArray []LetterFrequency) []byte {
 	return keys
 }
 
-func parseCipherText(s string) ([]byte, [26][26]float64) {
-	letterFrequencyArray := getLetterFrequencies(s)
-	keys := guessKeyByFrequencyAnalysis(letterFrequencyArray)
+func parseText(s string) [26][26]float64 {
 	biGramCountMatrix := [26][26]int{}
-	biGramPercentageMatrix := [26][26]float64{}
 	for i := 0; i < len(s)-1; i++ {
-		c1, c2 := s[i], s[i+1]
-		t1, t2 := keys[c1-'A'], keys[c2-'A']
+		t1, t2 := s[i], s[i+1]
 		biGramCountMatrix[t2-'A'][t1-'A']++
 	}
+	biGramPercentageMatrix := [26][26]float64{}
 	for i := 0; i < 26; i++ {
 		for j := 0; j < 26; j++ {
 			f := float64(biGramCountMatrix[i][j]) / float64(len(s)-1)
 			biGramPercentageMatrix[i][j] = math.Round(f*1000000) / 10000
 		}
 	}
-	return keys, biGramPercentageMatrix
+	return biGramPercentageMatrix
+}
+
+func Decipher(s string) string {
+	letterFrequencyArray := getLetterFrequencies(s)
+	putativeKey := guessKeyByFrequencyAnalysis(letterFrequencyArray)
+	putativePlainText := encrypt.Encipher(s, putativeKey)
+	key := fastMethodAlgorithm2(putativePlainText, putativeKey)
+	return encrypt.Encipher(s, key)
 }
 
 // fastMethodAlgorithm1 has to parse the text every time
@@ -82,18 +90,21 @@ func fastMethodAlgorithm1() {
 // 11, Ket `k=k'`
 // 12. Let `D=D'`
 // 13. Go to step 6
-func fastMethodAlgorithm2(cipherText string) []byte {
-	key, matrix := parseCipherText(cipherText)
+func fastMethodAlgorithm2(putativePlaintext string, key []byte) []byte {
+	matrix := parseText(putativePlaintext)
+	log.Printf("Putative key: %v", string(key))
 	score := getMatricesDistance(matrix, BiGramFactMatrix)
 
 start:
 	for i := 1; i < 26; i++ {
-		for j := 1; j < 26-i; j++ {
+		for j := 0; j < 25-i; j++ {
 			newMatrix := swapMatrix(matrix, j, i)
 			newScore := getMatricesDistance(newMatrix, BiGramFactMatrix)
+			//log.Printf("new error: %v", newScore)
 			if newScore < score {
 				// update keys and matrix
 				key = swapKey(key, j, i)
+				log.Printf("new key: %v", string(key))
 				matrix = newMatrix
 				score = newScore
 				continue start

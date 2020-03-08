@@ -1,8 +1,10 @@
 package decrypt
 
 import (
+	"fmt"
 	"github.com/lingt-xyz/substitutionDeciphers/encrypt"
 	"github.com/lingt-xyz/substitutionDeciphers/text"
+	"io/ioutil"
 	"strings"
 	"testing"
 )
@@ -35,9 +37,30 @@ func TestGuessKeyByFrequencyAnalysis(t *testing.T){
 
 func TestParseCipherText(t *testing.T){
 	plainText := text.FilterText("defend the east wall of the castle")
-
 	encrypt.Encipher(plainText, encrypt.GenerateKey(text.KeySpace))
-	keys, matrix := parseText(plainText)
-	t.Logf("%v", keys)
+	matrix := parseText(plainText)
 	t.Logf("%v", matrix)
+}
+
+func TestParsePlainText(t *testing.T){
+	testFile := "../data/sample.txt"
+	content, err := ioutil.ReadFile(testFile)
+	if err != nil {
+		t.Fatalf("Cannot open the file '%v', please check its existence and the reading permission is given.", testFile)
+	}
+	plainText := text.FilterText(string(content))
+
+	matrix := parseText(plainText)
+	fmt.Print("{")
+	for _, r := range matrix{
+		fmt.Print("{")
+		for _, c := range r{
+			fmt.Print(c)
+			fmt.Printf(",")
+		}
+		fmt.Print("}")
+		fmt.Printf(",")
+	}
+	fmt.Print("}")
+	//t.Logf("%v", matrix)
 }

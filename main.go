@@ -26,7 +26,7 @@ func main() {
 	log.Printf("Plain text (%v): %v", len(plainText), plainText)
 	key := encrypt.GenerateKey(text.KeySpace)
 	log.Printf("Generated the key: %v", string(key))
-	log.Printf("Expecting the key: %v", string(encrypt.InverseKey(key)))
+	//log.Printf("Expecting the key: %v", string(encrypt.InverseKey(key)))
 	cipherText := encrypt.Encipher(plainText, key)
 	//log.Printf("Cipher text: %v", cipherText)
 	plainText = decrypt.Decipher(cipherText)

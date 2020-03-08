@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// GenerateKey generates a key randomly from the given key space.
 func GenerateKey(keySpace []byte) []byte {
 	keys := make([]byte, len(keySpace))
 	copy(keys, keySpace)
@@ -14,20 +15,21 @@ func GenerateKey(keySpace []byte) []byte {
 	return keys
 }
 
-func InverseKey(key []byte) []byte {
-	inverseKey := make([]byte, len(key))
-	for i, c := range key {
-		inverseKey[c-'A'] = byte(i + 'A')
-	}
-	return inverseKey
-}
+//func InverseKey(key []byte) []byte {
+//	inverseKey := make([]byte, len(key))
+//	for i, c := range key {
+//		inverseKey[c-'A'] = byte(i + 'A')
+//	}
+//	return inverseKey
+//}
 
-func Encipher(s string, keys []byte) string {
+// Encipher enciphers a given plain text with the given key and return the cipher.
+func Encipher(s string, key []byte) string {
 	var b strings.Builder
 	b.Grow(len(s))
 	for i := 0; i < len(s); i++ {
 		c := s[i]
-		b.WriteByte(keys[c-'A'])
+		b.WriteByte(key[c-'A'])
 	}
 	return b.String()
 }

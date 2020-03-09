@@ -15,13 +15,14 @@ func GenerateKey(keySpace []byte) []byte {
 	return keys
 }
 
-//func InverseKey(key []byte) []byte {
-//	inverseKey := make([]byte, len(key))
-//	for i, c := range key {
-//		inverseKey[c-'A'] = byte(i + 'A')
-//	}
-//	return inverseKey
-//}
+// InverseKey generates the decipher key from the given encipher key
+func InverseKey(key []byte) []byte {
+	inverseKey := make([]byte, len(key))
+	for i, c := range key {
+		inverseKey[c-'A'] = byte(i + 'A')
+	}
+	return inverseKey
+}
 
 // Encipher enciphers a given plain text with the given key and return the cipher.
 func Encipher(s string, key []byte) string {

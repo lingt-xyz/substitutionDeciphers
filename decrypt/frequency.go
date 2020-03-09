@@ -2,6 +2,8 @@ package decrypt
 
 import (
 	"fmt"
+	"math"
+	"sort"
 	"strings"
 )
 
@@ -837,15 +839,16 @@ func ConvertAlphabetOrderToFrequencyOrder(alphabetOrder [26][26]float64) [26][26
 	matrix := [26][26]float64{}
 	for r := range alphabetOrder {
 		rIndex := FindIndex(byte(r + 'A'))
-		for c := range BiGramFactMatrixByAlphabet[r] {
+		for c := range alphabetOrder[r] {
 			// find index
 			cIndex := FindIndex(byte(c + 'A'))
-			matrix[rIndex][cIndex] = BiGramFactMatrixByAlphabet[r][c]
+			matrix[rIndex][cIndex] = alphabetOrder[r][c]
 		}
 	}
 	return matrix
 }
 
+// TabulateMatrix prints matrix in a table format
 func TabulateMatrix(matrix [26][26]float64, byFrequency bool){
 	fmt.Printf("|%6s", " ")
 	if byFrequency{
@@ -870,4 +873,49 @@ func TabulateMatrix(matrix [26][26]float64, byFrequency bool){
 		}
 		fmt.Printf("|\n")
 	}
+}
+
+// GetLetterFrequencies gets letter frequencies and sort letters by their frequencies
+func GetLetterFrequencies(s string) []LetterFrequency {
+	frequencyArray := make([]LetterFrequency, 26)
+	// initialize letters
+	for i := 0; i < len(frequencyArray); i++ {
+		frequencyArray[i].letter = byte(i + 'A')
+	}
+
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		frequencyArray[c-'A'].frequency++
+	}
+
+	// sort by frequency
+	sort.SliceStable(frequencyArray, func(i, j int) bool {
+		return frequencyArray[i].frequency > frequencyArray[j].frequency
+	})
+	return frequencyArray
+}
+
+// TabulateLetterFrequency formats the output of letter frequency
+func TabulateLetterFrequency(lf []LetterFrequency){
+	for _, v := range lf{
+		fmt.Printf("%v:%v,", string(v.letter), v.frequency)
+	}
+	fmt.Println()
+}
+
+// parseText parses text into a biGram
+func parseText(s string) [26][26]float64 {
+	biGramCountMatrix := [26][26]int{}
+	for i := 0; i < len(s)-1; i++ {
+		t1, t2 := s[i], s[i+1]
+		biGramCountMatrix[t2-'A'][t1-'A']++
+	}
+	biGramPercentageMatrix := [26][26]float64{}
+	for i := 0; i < 26; i++ {
+		for j := 0; j < 26; j++ {
+			f := float64(biGramCountMatrix[i][j]) / float64(len(s)-1)
+			biGramPercentageMatrix[i][j] = math.Round(f*1000000) / 10000
+		}
+	}
+	return biGramPercentageMatrix
 }

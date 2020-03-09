@@ -23,14 +23,14 @@ func TestGetLetterFrequencies(t *testing.T) {
 			U+8A9E '語' starts at byte position 61`, "UEstartsatbytepositionUCstartsatbytepositionUAEstartsatbyteposition"},
 	}
 	for _, testCase := range testCases {
-		frequencyArray := getLetterFrequencies(strings.ToUpper(testCase.output))
+		frequencyArray := GetLetterFrequencies(strings.ToUpper(testCase.output))
 		t.Logf("Frequency: %v", frequencyArray)
 	}
 }
 
 func TestGuessKeyByFrequencyAnalysis(t *testing.T){
 	cipherText := strings.ToUpper("LefranaisestunelangueindoeuropennedelafamilledeslanguesromanesLefranaissestformenFrancevaritdelalanguedolquiestlalanguedelapartieseptentrionaledupaysLefranaisestdclarlangueofficielleenFranceen")
-	frequencyArray := getLetterFrequencies(cipherText)
+	frequencyArray := GetLetterFrequencies(cipherText)
 	keys := guessKeyByFrequencyAnalysis(frequencyArray)
 	t.Logf("Guessed keys: %v", keys)
 }
@@ -49,7 +49,7 @@ func TestParsePlainText(t *testing.T){
 		t.Fatalf("Cannot open the file '%v', please check its existence and the reading permission is given.", testFile)
 	}
 	plainText := text.FilterText(string(content))
-
+	t.Logf("Length: %v", len(plainText))
 	matrix := parseText(plainText)
 	fmt.Print("{")
 	for _, r := range matrix{

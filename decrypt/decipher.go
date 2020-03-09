@@ -4,33 +4,10 @@ import (
 	"github.com/lingt-xyz/substitutionDeciphers/encrypt"
 	"log"
 	"math"
-	"sort"
 )
 
 // http://norvig.com/mayzner.html
 // https://gist.github.com/lydell/c439049abac2c9226e53
-
-// getLetterFrequencies gets letter frequencies and sort letters by their frequencies
-func getLetterFrequencies(s string) []LetterFrequency {
-	frequencyArray := make([]LetterFrequency, 26)
-	// initialize letters
-	for i := 0; i < len(frequencyArray); i++ {
-		frequencyArray[i].letter = byte(i + 'A')
-	}
-
-	for i := 0; i < len(s); i++ {
-		c := s[i]
-		frequencyArray[c-'A'].frequency++
-	}
-
-	// sort by frequency
-	sort.SliceStable(frequencyArray, func(i, j int) bool {
-		return frequencyArray[i].frequency > frequencyArray[j].frequency
-	})
-	log.Printf("%v", LetterFrequencyFactArray)
-	log.Printf("%v", frequencyArray)
-	return frequencyArray
-}
 
 // guessKeyByFrequencyAnalysis gets keys by analysing letter frequencies
 func guessKeyByFrequencyAnalysis(frequencyArray []LetterFrequency) []byte {
@@ -42,25 +19,10 @@ func guessKeyByFrequencyAnalysis(frequencyArray []LetterFrequency) []byte {
 	return keys
 }
 
-func parseText(s string) [26][26]float64 {
-	biGramCountMatrix := [26][26]int{}
-	for i := 0; i < len(s)-1; i++ {
-		t1, t2 := s[i], s[i+1]
-		biGramCountMatrix[t2-'A'][t1-'A']++
-	}
-	biGramPercentageMatrix := [26][26]float64{}
-	for i := 0; i < 26; i++ {
-		for j := 0; j < 26; j++ {
-			f := float64(biGramCountMatrix[i][j]) / float64(len(s)-1)
-			biGramPercentageMatrix[i][j] = math.Round(f*1000000) / 10000
-		}
-	}
-	return biGramPercentageMatrix
-}
-
 func Decipher(s string) string {
-	letterFrequencyArray := getLetterFrequencies(s)
+	letterFrequencyArray := GetLetterFrequencies(s)
 	putativeKey := guessKeyByFrequencyAnalysis(letterFrequencyArray)
+	log.Printf("Putative key: %v", string(putativeKey))
 	putativePlainText := encrypt.Encipher(s, putativeKey)
 	key := fastMethodAlgorithm2(putativePlainText, putativeKey)
 	return encrypt.Encipher(s, key)
@@ -92,21 +54,23 @@ func fastMethodAlgorithm1() {
 // 13. Go to step 6
 func fastMethodAlgorithm2(putativePlaintext string, key []byte) []byte {
 	matrix := parseText(putativePlaintext)
-	log.Printf("Putative key: %v", string(key))
-	score := getMatricesDistance(matrix, BiGramFactMatrixByFrequency)
+	matrix = ConvertAlphabetOrderToFrequencyOrder(matrix)
+	distance := getMatricesDistance(matrix, BiGramFactMatrixByFrequency)
 
 start:
 	for i := 1; i < 26; i++ {
 		for j := 0; j < 25-i; j++ {
-			newMatrix := swapMatrix(matrix, j, i)
-			newScore := getMatricesDistance(newMatrix, BiGramFactMatrixByFrequency)
-			//log.Printf("new error: %v", newScore)
-			if newScore < score {
+			newMatrix := swapMatrix(matrix, j, j+i)
+			newDistance := getMatricesDistance(newMatrix, BiGramFactMatrixByFrequency)
+			//newDistance := getMatricesDistance(newMatrix, matrix)
+			if newDistance < distance {
 				// update keys and matrix
-				key = swapKey(key, j, i)
-				log.Printf("new key: %v", string(key))
+				key = swapKey(key, j, j+i)
+				log.Printf("Putative key: %v", string(key))
 				matrix = newMatrix
-				score = newScore
+				distance = newDistance
+				// restart outer loop
+				i = 0
 				continue start
 			}
 		}
@@ -117,18 +81,18 @@ start:
 func swapKey(keys []byte, j int, i int) []byte {
 	newKeys := make([]byte, 26)
 	copy(newKeys, keys)
-	newKeys[j] = keys[j+i]
-	newKeys[j+i] = keys[j]
+	newKeys[j] = keys[i]
+	newKeys[i] = keys[j]
 	return newKeys
 }
 
 func swapMatrix(matrix [26][26]float64, j int, i int) [26][26]float64 {
 	newMatrix := matrix
-	newMatrix[j] = matrix[j+i]
-	newMatrix[j+i] = matrix[j]
+	newMatrix[j] = matrix[i]
+	newMatrix[i] = matrix[j]
 	for row := range newMatrix {
-		newMatrix[row][j] = matrix[row][j+i]
-		newMatrix[row][j+i] = matrix[row][j]
+		newMatrix[row][j] = matrix[row][i]
+		newMatrix[row][i] = matrix[row][j]
 	}
 	return newMatrix
 }

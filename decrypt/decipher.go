@@ -93,13 +93,13 @@ func fastMethodAlgorithm1() {
 func fastMethodAlgorithm2(putativePlaintext string, key []byte) []byte {
 	matrix := parseText(putativePlaintext)
 	log.Printf("Putative key: %v", string(key))
-	score := getMatricesDistance(matrix, BiGramFactMatrix)
+	score := getMatricesDistance(matrix, BiGramFactMatrixByFrequency)
 
 start:
 	for i := 1; i < 26; i++ {
 		for j := 0; j < 25-i; j++ {
 			newMatrix := swapMatrix(matrix, j, i)
-			newScore := getMatricesDistance(newMatrix, BiGramFactMatrix)
+			newScore := getMatricesDistance(newMatrix, BiGramFactMatrixByFrequency)
 			//log.Printf("new error: %v", newScore)
 			if newScore < score {
 				// update keys and matrix

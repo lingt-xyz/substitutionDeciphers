@@ -15,6 +15,7 @@ func guessKeyByFrequencyAnalysis(frequencyArray []LetterFrequency) []byte {
 	for i, f := range frequencyArray {
 		key := LetterFrequencyFactArray[i].letter
 		keys[f.letter-'A'] = key
+		//keys[i] = f.letter
 	}
 	return keys
 }

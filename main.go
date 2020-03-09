@@ -35,6 +35,13 @@ func main() {
 	//log.Printf("Cipher text: %v", cipherText)
 	log.Printf("Cipher text letter frequency:")
 	decrypt.TabulateLetterFrequency(decrypt.GetLetterFrequencies(cipherText))
-	plainText = decrypt.Decipher(cipherText)
-	//log.Printf("Plain text: %v", plainText)
+	putativePlainText := decrypt.Decipher(cipherText)
+	//log.Printf("Decipher text: %v", putativePlainText)
+	numErr := 0
+	for i, c := range putativePlainText {
+		if byte(c) != byte(plainText[i]) {
+			numErr++
+		}
+	}
+	log.Printf("Length of plaintext: %v, Error: %v", len(plainText), numErr)
 }

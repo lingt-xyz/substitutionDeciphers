@@ -20,12 +20,14 @@ func guessKeyByFrequencyAnalysis(frequencyArray []LetterFrequency) []byte {
 	return keys
 }
 
-func Decipher(s string) string {
+func Decipher(s string, verbose bool) string {
 	letterFrequencyArray := GetLetterFrequencies(s)
 	putativeKey := guessKeyByFrequencyAnalysis(letterFrequencyArray)
-	log.Printf("Putative key: %v", string(putativeKey))
+	if verbose {
+		log.Printf("Putative key: %v", string(putativeKey))
+	}
 	putativePlainText := encrypt.Encipher(s, putativeKey)
-	key := fastMethodAlgorithm2(putativePlainText, putativeKey)
+	key := fastMethodAlgorithm2(putativePlainText, putativeKey, verbose)
 	return encrypt.Encipher(s, key)
 }
 
@@ -53,21 +55,28 @@ func fastMethodAlgorithm1() {
 // 11, Ket `k=k'`
 // 12. Let `D=D'`
 // 13. Go to step 6
-func fastMethodAlgorithm2(putativePlaintext string, key []byte) []byte {
+func fastMethodAlgorithm2(putativePlaintext string, key []byte, verbose bool) []byte {
 	matrix := parseText(putativePlaintext)
-	matrix = ConvertAlphabetOrderToFrequencyOrder(matrix)
-	distance := getMatricesDistance(matrix, BiGramFactMatrixByFrequency)
-
+	//matrix = ConvertAlphabetOrderToFrequencyOrder(matrix)
+	if verbose {
+		TabulateMatrix(matrix, false)
+	}
+	distance := getMatricesDistance(matrix, BiGramFactMatrixByAlphabet, /* BiGramFactMatrixByFrequency*/)
 start:
 	for i := 1; i < 26; i++ {
 		for j := 0; j < 25-i; j++ {
 			newMatrix := swapMatrix(matrix, j, j+i)
-			newDistance := getMatricesDistance(newMatrix, BiGramFactMatrixByFrequency)
-			//newDistance := getMatricesDistance(newMatrix, matrix)
+			newDistance := getMatricesDistance(newMatrix, BiGramFactMatrixByAlphabet, /* BiGramFactMatrixByFrequency*/)
 			if newDistance < distance {
 				// update keys and matrix
-				key = swapKey(key, j, j+i)
-				log.Printf("Putative key: %v", string(key))
+				key = swapKey(key, byte(j+'A'), byte(j+i+'A'))
+				if verbose{
+					log.Printf("Found lower error %v\n", newDistance)
+					TabulateMatrix(newMatrix, false)
+					log.Printf("Swap %v and %v", j, j+i)
+					log.Printf("Putative key: %v", string(key))
+
+				}
 				matrix = newMatrix
 				distance = newDistance
 				// restart outer loop
@@ -79,11 +88,21 @@ start:
 	return key
 }
 
-func swapKey(keys []byte, j int, i int) []byte {
+// swapKey swaps keys at index `i` and `j`.
+func swapKey(keys []byte, k1 byte, k2 byte) []byte {
 	newKeys := make([]byte, 26)
 	copy(newKeys, keys)
-	newKeys[j] = keys[i]
-	newKeys[i] = keys[j]
+	indexK1 := -1
+	indexK2 := -1
+	for i, v := range keys {
+		if k1 == v {
+			indexK1 = i
+		} else if k2 == v {
+			indexK2 = i
+		}
+	}
+	newKeys[indexK1] = keys[indexK2]
+	newKeys[indexK2] = keys[indexK1]
 	return newKeys
 }
 

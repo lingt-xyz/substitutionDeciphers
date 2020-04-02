@@ -25,6 +25,7 @@ func InverseKey(key []byte) []byte {
 }
 
 // Encipher enciphers a given plain text with the given key and return the cipher.
+// `key` should be mapping from `A` to `Z`, not by frequency
 func Encipher(s string, key []byte) string {
 	var b strings.Builder
 	b.Grow(len(s))

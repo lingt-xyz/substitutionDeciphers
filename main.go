@@ -76,7 +76,8 @@ func main() {
 				numErr++
 			}
 		}
-		log.Printf("Plain text (error %.2f): %v", float64(numErr)/float64(len(normalizedText)), putativePlainText)
+		log.Printf("Plain text (length %v, error %.2f): %v", len(normalizedText), float64(numErr)/float64(len(normalizedText)), putativePlainText)
+		//log.Printf("Plain text (length %v, error %.2f)", len(normalizedText), float64(numErr)/float64(len(normalizedText)))
 	} else {
 		log.Fatalf("Unsupported cipher operation %v; `encipher` or `decipher` was expected.", *cipherType)
 	}

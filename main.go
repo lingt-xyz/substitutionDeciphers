@@ -39,20 +39,14 @@ func main() {
 			log.Printf("Using given key: %v", string(key))
 		}
 		cipherText := encrypt.Encipher(normalizedText, key)
-		log.Printf("Cipher text: %v", cipherText)
+		log.Printf("Cipher text (length %v): %v", len(cipherText), cipherText)
 	} else if *cipherType == "decipher" {
 		if *verbose {
 			log.Printf("Cipher text (%v letters): %v", len(normalizedText), normalizedText)
 		}
 		//decrypt.TabulateLetterFrequency(decrypt.GetLetterFrequencies(normalizedText))
 		putativePlainText := decrypt.Decipher(normalizedText, *verbose)
-		numErr := 0
-		for i, c := range putativePlainText {
-			if byte(c) != normalizedText[i] {
-				numErr++
-			}
-		}
-		log.Printf("Plain text (error %.2f): %v", float64(numErr)/float64(len(normalizedText)), putativePlainText)
+		log.Printf("Plain text (length %v): %v", len(normalizedText), putativePlainText)
 	} else if *cipherType == "demo" {
 		if *verbose {
 			log.Printf("Plain text (%v letters): %v", len(normalizedText), normalizedText)

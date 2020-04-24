@@ -6,6 +6,7 @@ A Fast Method for the Cryptanalysis of Substitution Ciphers by Thomas Jakobsen
 
 - GNU/Linux: `go build`
 - Windows: `env GOOS=windows GOARCH=amd64 go build`
+- OXS: `env GOOS=darwin GOARCH=amd64 go build`
 
 ## How to run it
 

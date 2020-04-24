@@ -11,7 +11,7 @@ import (
 
 func main() {
 	verbose := flag.Bool("v", false, "output verbose debug information")
-	cipherType := flag.String("c", "encipher", "type of cipher operation; should be `encipher`, `decipher` or `demo`")
+	cipherType := flag.String("c", "encipher", "type of cipher operation; should be 'encipher', 'decipher' or 'demo'")
 
 	givenText := flag.String("i", "", "full path of the file for testing")
 	givenKey := flag.String("k", "", "key for encipher")
